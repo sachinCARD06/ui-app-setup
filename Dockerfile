@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies and tailwindcss
-RUN npm ci && \
+RUN npm install -g npm@11.5.1 && \
+    npm ci && \
     npm install tailwindcss postcss autoprefixer
 
 # Copy project files
