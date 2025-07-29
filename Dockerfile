@@ -7,15 +7,15 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies and tailwindcss
+RUN npm ci && \
+    npm install tailwindcss postcss autoprefixer
 
 # Copy project files
 COPY . .
 
-# Install tailwindcss globally and build
-RUN npm install -g tailwindcss && \
-    npm run tailwind:build && \
+# Build the application
+RUN npm run tailwind:build && \
     npm run build || \
     (echo "Build failed. Checking TypeScript errors..." && \
     npx tsc --noEmit && \
