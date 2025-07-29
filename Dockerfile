@@ -13,8 +13,12 @@ RUN npm ci
 # Copy project files
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build TypeScript files first, then run Vite build
+RUN npm run tailwind:build && \
+    npm run build || \
+    (echo "Build failed. Checking TypeScript errors..." && \
+    npx tsc --noEmit && \
+    exit 1)
 
 # Expose port 3000
 EXPOSE 3000
