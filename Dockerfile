@@ -13,8 +13,9 @@ RUN npm ci
 # Copy project files
 COPY . .
 
-# Build TypeScript files first, then run Vite build
-RUN npm run tailwind:build && \
+# Install tailwindcss globally and build
+RUN npm install -g tailwindcss && \
+    npm run tailwind:build && \
     npm run build || \
     (echo "Build failed. Checking TypeScript errors..." && \
     npx tsc --noEmit && \
