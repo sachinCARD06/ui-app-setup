@@ -1,0 +1,39 @@
+name: React CI/CD with Docker
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main  # or master
+      - ci-cd-setup
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 🏗️ Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/ui-app-set:latest
+            ${{ secrets.DOCKER_USERNAME }}/ui-app-set:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/ui-app-set:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/ui-app-set:buildcache,mode=max
